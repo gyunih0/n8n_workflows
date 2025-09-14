@@ -1,0 +1,1354 @@
+{
+  "name": "Jira Automation Management Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "jql": "=project IN (\"PRDR\", \"PAR\", \"HPR\") AND assignee = currentUser() AND updatedDate >= -30d ORDER BY updatedDate ASC"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8cb61fa6-c607-441f-a0db-f468fc016281",
+      "name": "Get many issues",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "mpwmlsQrYfJOBa3y",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bc0cf9c6-55f0-42d0-ba0a-748cef7430bb",
+              "name": "issueKey",
+              "value": "={{ $json.key }}",
+              "type": "string"
+            },
+            {
+              "id": "3603a954-52f3-4be1-a23a-17c9dd0f5708",
+              "name": "issueName",
+              "value": "={{ $json.fields.summary }}",
+              "type": "string"
+            },
+            {
+              "id": "266b4118-738b-4230-bfda-ca807361129f",
+              "name": "description",
+              "value": "={{ $json.fields.description }}",
+              "type": "string"
+            },
+            {
+              "id": "2435de81-c2ce-4af3-9eea-20cbb7c85228",
+              "name": "statusKey",
+              "value": "={{ $json.fields.statusCategory.key }}",
+              "type": "string"
+            },
+            {
+              "id": "02fd4451-0bb9-45b3-98cf-bdcc679efef0",
+              "name": "statusName",
+              "value": "={{ $json.fields.status.name }}",
+              "type": "string"
+            },
+            {
+              "id": "fa4bd83c-464d-4043-8e30-0407afba75f2",
+              "name": "status",
+              "value": "={{ $json.fields.statusCategory.name }}",
+              "type": "string"
+            },
+            {
+              "id": "3ca1de65-a3f4-408c-ab42-ad7af0d918ff",
+              "name": "assignee",
+              "value": "={{ $json.fields.assignee.displayName }}",
+              "type": "string"
+            },
+            {
+              "id": "4e9b2042-fb4e-46eb-9a93-a078598aeb45",
+              "name": "reporter",
+              "value": "={{ $json.fields.reporter.displayName }}",
+              "type": "string"
+            },
+            {
+              "id": "9e4c5d25-5ad6-4621-b329-a362d5a3f4d6",
+              "name": "priority",
+              "value": "={{ $json.fields.priority.name }}",
+              "type": "string"
+            },
+            {
+              "id": "5b8007ee-77da-4319-9f97-d67f31ead445",
+              "name": "createdAt",
+              "value": "={{ $json.fields.created.toDateTime().format('yyyy-MM-dd HH:mm') }}",
+              "type": "string"
+            },
+            {
+              "id": "fe67fd53-df72-4911-b80d-af4e26a17219",
+              "name": "updatedAt",
+              "value": "={{ $json.fields.updated.toDateTime().format('yyyy-MM-dd HH:mm:ss') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        0
+      ],
+      "id": "91b9f38d-5bed-479c-80c2-bd1a26db754d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "07d4c789-c58a-4f2f-b759-013a35c322dd",
+                    "leftValue": "={{ $json.statusKey }}",
+                    "rightValue": "=done",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Completed"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bc1963e9-fa2d-4e1b-b435-417b9f829894",
+                    "leftValue": "={{[\"Validation\", \"검수요청\", \"검수완료\"]}}",
+                    "rightValue": "={{ $json.statusName }}",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notContains",
+                      "rightType": "any"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": " Unfinished Issues"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{[\"Validation\", \"검수요청\"]}}",
+                    "rightValue": "={{ $json.statusName }}",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    },
+                    "id": "8ef8db09-6ad9-4600-8ca8-e16f7fca7a51"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "validation requested"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        608,
+        -16
+      ],
+      "id": "528ddd54-bec2-4fab-bfc3-3d396c3d2913",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "content": "## 한계점 및 개선 필요\n1. RAG 검색 결과의 정확도가 생각보다 낮다.\n   - Embedding 관련 스터디 필요\n2. Qrant 대신 superbase vector DB 사용하면 id 값으로 update 하면서 중복 제거 플로우를 없앨 수 있지 않을까?",
+        "width": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -192,
+        -384
+      ],
+      "typeVersion": 1,
+      "id": "d3b9e4be-e4b5-4a32-a97c-d61ec23659c0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "options": {
+          "systemMessage": "=당신은 이슈 트래킹 데이터를 요약하고, 연결된 MCP Client Tool을 통해 텔레그램으로 바로 전송하는 AI 어시스턴트입니다. 다음 지침을 반드시 따르세요.\n\n1. **입력 데이터**: JSON 배열 형태의 이슈 리스트. 각 이슈 객체는 다음 필드를 포함합니다:\n   - issueKey\n   - issueName\n   - description\n   - statusKey\n   - statusName\n   - status\n   - assignee\n   - reporter\n   - priority\n   - createdAt (ISO 8601, 한국 시간)\n   - updatedAt (ISO 8601, 한국 시간)\n\n2. **처리 방법**:\n   a. `createdAt` 기준 오름차순으로 정렬\n   b. 가장 오래된 5건은 상세 요약:\n      - 제목: [issueName] ([issueKey])\n      - 상태: [statusName]\n      - 담당자: [assignee]\n      - 작성자: [reporter]\n      - 우선순위: [priority]\n      - 생성일: [YYYY-MM-DD HH:mm KST]\n      - 업데이트일: [YYYY-MM-DD HH:mm KST]\n      - 설명: [최대 200자, 없으면 \"없음\"]\n   c. 나머지 이슈는 **상태별로 그룹화**하여 간략 요약:\n      - 형식: \n        [상태명]\n        - [이슈키] 이슈명\n        - [이슈키] 이슈명\n      - 상태별로 구분\n      - 메시지 길이 제한(텔레그램 한도 4096자) 고려\n      - 필요 시 여러 메시지로 나누어 전송\n\n3. **출력 형식**:\n   - 텔레그램용 한글 요약 텍스트\n   - 헤더: \"📝 이슈 요약\"\n   - 서브헤더: \"📌 오래된 5개 이슈\" → 번호 매겨서 상세 나열\n   - 서브헤더: \"📌 나머지 이슈 간략 요약\" → 상태별 간략 리스트\n   - 특수문자(`_`, `*`, `[`, `]` 등)는 Telegram Markdown에서 안전하게 이스케이프\n\n4. **MCP Client Tool 사용법**:\n   - 연결된 MCP Client Tool을 사용하여 텔레그램으로 요약 전송\n   - chatId는 MCP Tool 설정값 사용, 별도로 지정할 필요 없음\n   - 메시지가 너무 길 경우, 자동으로 여러 메시지로 나누어 전송\n   - 전송 실패 시 재시도 1~2회 시도\n\n5. **추가 지침**:\n   - 모든 날짜는 한국시간(UTC+9)으로 변환\n   - 요약은 간결하게, 핵심 정보만 포함\n   - 출력은 MCP Client Tool에서 바로 전송 가능한 텍스트 형태"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        0
+      ],
+      "id": "3b3a45b5-4d49-456c-b2f1-98e0e7fa537c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1328,
+        192
+      ],
+      "id": "713c1490-7787-4372-9cf2-5c0243a7c2b8",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "4b9A0wVGSHlfntWd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "80c7677c-9404-4e65-8fab-277d3e5f932a",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://78720bbf151b.ngrok-free.app/mcp/73c88868-a568-4c0d-827f-45e508f43687",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        192
+      ],
+      "id": "e44f8229-fad1-48f6-aa71-fc7541e1b0ea",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2457cd17-9a9f-43bc-8181-51f9a00271f8",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## Work Flow 설계\n\n### 기능\n1. **매일 이슈 현황 요약 및 메시지 전송**\n   - **대상 이슈**: 최근 업데이트 일자가 최대 30일 이전인, 완료되지 않은 이슈\n   - **정리 기준**: (정리 기준 내용 작성 필요)\n\n2. **오래된 검수요청 또는 Validation 이슈 재확인**\n   - **대상 이슈**: 최근 업데이트 일자가 최대 10일 이상 지났고, 상태가 `검수요청` 또는 `Validation` 인 이슈\n   - **코멘트 형식**: (추가할 코멘트 내용 작성 필요)\n\n3. **완료된 일 History Docs화**\n   - **대상 이슈**: 최근 업데이트 일자가 7일 이상 지났고, 상태가 `완료` 인 이슈\n   - **처리 방식**: Vector Embedding → History Docs 저장\n",
+        "height": 416,
+        "width": 560,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        128,
+        -640
+      ],
+      "typeVersion": 1,
+      "id": "ee071da5-66ea-4b00-85b5-07e5f1018fed",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "89698538-f0be-4109-8042-dfa1fb6270f9",
+              "leftValue": "={{ $json.updatedAt }}",
+              "rightValue": "={{ $now.setZone(\"Asia/Seoul\").minus(10, 'days') }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "before"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        448
+      ],
+      "id": "de3b3443-4ac2-4873-b10f-4921a0a77481",
+      "name": "If 10+days older"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f239e51d-59cf-43a0-b120-4905bb0337c5",
+              "leftValue": "={{ $json.updatedAt }}",
+              "rightValue": "={{ $now.setZone(\"Asia/Seoul\").minus(7, 'days') }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "before"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        912,
+        -736
+      ],
+      "id": "2458fcbc-ca57-4a4e-9d21-8e9f0729fb03",
+      "name": "If 7+days older"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "def extract_text(content):\n    \"\"\"\n    text만 추출\n    \"\"\"\n    result = \"\"\n    if not content:\n        return result\n\n    for node in content:\n        if node.get(\"type\") == \"text\" and \"text\" in node:\n            result += node[\"text\"]\n        elif node.get(\"type\") == \"mention\" and \"attrs\" in node and \"text\" in node[\"attrs\"]:\n            # mention 텍스트 그대로 추가\n            result += node[\"attrs\"][\"text\"]\n        if \"content\" in node:\n            result += extract_text(node[\"content\"])\n        if node.get(\"type\") == \"paragraph\":\n            result += \"\\n\"\n    return result\n\n# n8n _input.all() 형태의 data\ndata = _input.all()\nall_text = \"\"\n\nfor comment in data:\n    body_content = comment.get(\"json\", {}).get(\"body\", {}).get(\"content\", [])\n    if body_content:\n        author = comment.get(\"json\", {}).get(\"author\", {}).get(\"displayName\", \"Unknown\")\n        text = extract_text(body_content)\n        # 연속된 빈 줄 제거\n        text = \"\\n\".join([line for line in text.splitlines() if line.strip()])\n        text = text.strip()\n        if text:\n            all_text += f\"[{author}] {text}\\n\\n\"\n# n8n Function 노드에서 반환\n\nreturn [{\"json\": {\"comments\": all_text.strip()}}]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2176,
+        -848
+      ],
+      "id": "ab6b46be-0ec0-4312-bdab-ccf8f3406602",
+      "name": "Extract Comment Text"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "jira_history",
+          "mode": "list",
+          "cachedResultName": "jira_history"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        2048,
+        -592
+      ],
+      "id": "e0621a0c-85ef-4662-947a-df98f31f6775",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "NysHo44S5vrXfiVE",
+          "name": "Local Qdrant API Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2000,
+        -384
+      ],
+      "id": "9221cf30-f7ef-48a0-bbbd-05d79466da4d",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "4b9A0wVGSHlfntWd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        -272
+      ],
+      "id": "0904ac3f-e8f3-4ce5-91ee-ba24b1266f6d",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "resource": "issueComment",
+        "issueKey": "={{ $json.issueKey }}",
+        "comment": "안녕하세요. 추가적인 이슈 없다면 완료처리 부탁 드립니다!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        448
+      ],
+      "id": "2dfbe026-7a75-4f95-9207-0a60225d644f",
+      "name": "Add a comment",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "mpwmlsQrYfJOBa3y",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "=IssueKey: {{ $json.issueKey }}\nIssueName: {{ $json.issueName }}\nDescription: {{ $json.description }}\nAssignee: {{ $json.assignee }}\nReporter: {{ $json.reporter }}\nCreatedAt: {{ $json.createdAt }}\nUpdatedAt: {{ $json.updatedAt }}\nComments: {{ $json.comments }}",
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "issueKey",
+                "value": "={{ $json.issueKey }}"
+              },
+              {
+                "name": "issueName",
+                "value": "={{ $json.issueName }}"
+              },
+              {
+                "name": "assignee",
+                "value": "={{ $json.assignee }}"
+              },
+              {
+                "name": "reporter",
+                "value": "={{ $json.reporter }}"
+              },
+              {
+                "name": "createdAt",
+                "value": "={{ $json.createdAt }}"
+              },
+              {
+                "name": "updatedAt",
+                "value": "={{ $json.updatedAt }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        2128,
+        -384
+      ],
+      "id": "9a00f549-5fa5-485a-8768-391cb69870ed",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "resource": "issueComment",
+        "operation": "getAll",
+        "issueKey": "={{ $('Loop Over Items').item.json.issueKey }}",
+        "returnAll": true,
+        "options": {
+          "orderBy": "+created"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        -848
+      ],
+      "id": "395563ea-d694-489f-84b1-8b9d54441f90",
+      "name": "Get many comments",
+      "alwaysOutputData": true,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "mpwmlsQrYfJOBa3y",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        368
+      ],
+      "id": "3e205f1c-49ef-4e23-869d-9aa3f77e8cde",
+      "name": "When chat message received",
+      "webhookId": "3b3a9aea-7ebb-437a-9296-9a82097c1903"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        368
+      ],
+      "id": "fa9ff14a-3c5e-4ec5-ab1b-21d2c2caa6f2",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        64,
+        560
+      ],
+      "id": "16958e47-cbe4-4511-97a0-b1a66a63dc8d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Fy6vwTBzE1u9DE4k",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "jira_history",
+          "mode": "list",
+          "cachedResultName": "jira_history"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        704
+      ],
+      "id": "80e6f79a-ce9b-470f-acaa-ca7e75e682b2",
+      "name": "Qdrant Vector Store2",
+      "credentials": {
+        "qdrantApi": {
+          "id": "NysHo44S5vrXfiVE",
+          "name": "Local Qdrant API Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        720
+      ],
+      "id": "5bc32790-89f6-458c-bb14-e5ab9e786879",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "4b9A0wVGSHlfntWd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        832
+      ],
+      "id": "b38c25ed-12d6-4180-b78e-5f75d475a517",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "4b9A0wVGSHlfntWd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        560
+      ],
+      "id": "1dc50880-a190-49be-a032-01d3939c9027",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "4b9A0wVGSHlfntWd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "완료된 Jira Issue의 history를 검색하는 툴",
+        "topK": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        560
+      ],
+      "id": "d4bf46d5-ebda-4a5d-b629-2645bc16cb8b",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f348dd80-9916-4499-b180-75839f3369ce",
+              "name": "issueKey",
+              "value": "={{ $('Loop Over Items').last().json.issueKey }}",
+              "type": "string"
+            },
+            {
+              "id": "10667933-3ee8-46eb-a23e-7cf5d226444c",
+              "name": "issueName",
+              "value": "={{ $('Loop Over Items').last().json.issueName }}",
+              "type": "string"
+            },
+            {
+              "id": "fa62339b-02da-409f-9145-a8200e3f50fe",
+              "name": "description",
+              "value": "={{ $('Loop Over Items').last().json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "98dd946a-5e1f-4ef4-a9a1-9f3ccc03aa11",
+              "name": "statusKey",
+              "value": "={{ $('Loop Over Items').last().json.statusKey }}",
+              "type": "string"
+            },
+            {
+              "id": "da703c67-be1c-4ab3-8eca-40448da31318",
+              "name": "statusName",
+              "value": "={{ $('Loop Over Items').last().json.statusName }}",
+              "type": "string"
+            },
+            {
+              "id": "b1d75469-fda5-4f2b-8bb4-26f6c6943f92",
+              "name": "status",
+              "value": "={{ $('Loop Over Items').last().json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "42834343-935a-402e-a45f-63ba9e760de8",
+              "name": "assignee",
+              "value": "={{ $('Loop Over Items').last().json.assignee }}",
+              "type": "string"
+            },
+            {
+              "id": "533bdc4d-f7b9-49be-9289-b4c92f3c6fea",
+              "name": "reporter",
+              "value": "={{ $('Loop Over Items').last().json.reporter }}",
+              "type": "string"
+            },
+            {
+              "id": "eb34adbf-e47c-4cf8-8584-b1e09b52655f",
+              "name": "priority",
+              "value": "={{ $('Loop Over Items').last().json.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "3ac450d1-d115-4160-84c3-f77cc5dff4cc",
+              "name": "createdAt",
+              "value": "={{ $('Loop Over Items').last().json.createdAt }}",
+              "type": "string"
+            },
+            {
+              "id": "f76f45fb-ca0e-417e-bf62-acbc69d87fc4",
+              "name": "updatedAt",
+              "value": "={{ $('Loop Over Items').last().json.updatedAt }}",
+              "type": "string"
+            },
+            {
+              "id": "e975b4ab-5955-44cf-990f-ab88624ed64f",
+              "name": "comments",
+              "value": "={{ $json.comments }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1792,
+        -592
+      ],
+      "id": "e225b2b5-53e8-465f-af87-8e5ed8e750b3",
+      "name": "build issue data"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT EXISTS (\n  SELECT 1 \n  FROM workflow_db.jira_issues ji \n  WHERE ji.issue_key = '{{ $json.issueKey }}'\n) AS exists_flag;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1376,
+        -736
+      ],
+      "id": "5b0476c5-7490-40a1-a7d3-86edd99a1c25",
+      "name": "Execute a SQL query",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "fKKmu8VonqG0eAEM",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "226c1dad-6f0e-4989-b22a-76cef88c4384",
+              "leftValue": "={{ $json.exists_flag }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1568,
+        -736
+      ],
+      "id": "c168c4ea-3700-49b8-9252-17dbfa3fcd1a",
+      "name": "If not exists"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "workflow_db",
+          "mode": "list",
+          "cachedResultName": "workflow_db"
+        },
+        "table": {
+          "__rl": true,
+          "value": "jira_issues",
+          "mode": "list",
+          "cachedResultName": "jira_issues"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "inserted_at": "={{ $now }}",
+            "issue_key": "={{ $('Loop Over Items').item.json.issueKey }}",
+            "issue_name": "={{ $('Loop Over Items').item.json.issueName }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "issue_key",
+              "displayName": "issue_key",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "issue_name",
+              "displayName": "issue_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "inserted_at",
+              "displayName": "inserted_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1792,
+        -848
+      ],
+      "id": "2ddd1d90-c1ef-4689-8cc0-7999c0285647",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "fKKmu8VonqG0eAEM",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1168,
+        -752
+      ],
+      "id": "eba9e50b-70ed-44dd-a14c-d7cf31567f56",
+      "name": "Loop Over Items",
+      "executeOnce": false
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        560
+      ],
+      "id": "85974c37-f973-4d24-b445-9244b1451c89",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "## Jira Issue 조회\n1. 업데이트 일자가 30일 이전인 Jira Issues 조회\n2. 필요한 데이터 추출, formatting\n3. CASE 분리",
+        "height": 464,
+        "width": 880
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "cc9101a0-dee8-46e2-80f5-59ff774cb8e4",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## 완료된 이슈 Embedding\n1. 완료된지 7일 이상 지난 이슈들을 대상으로 진행.\n2. Postgres DB를 이용하여 중복 저장 방지\n3. 이슈의 Jira Comments 조회\n4. Qdrant Vector DB로 임베딩\n - model: text-embedding-3-large ",
+        "height": 800,
+        "width": 1680,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        816,
+        -944
+      ],
+      "typeVersion": 1,
+      "id": "221caff4-9523-4fd2-8141-e52751a49e10",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 진행중인 이슈 요약\n- 진행중인 Issue들을 AI Agent로 요약\n- 요약된 리포트 내용을 MCP Client Tool을 통해 Telegram으로 전송",
+        "height": 464,
+        "width": 960,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        816,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "a0877b4d-57a7-4cbb-a94b-17fb5548a48d",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## 방치된 이슈 리마인드\n- 검수 완료 또는 요청이 되어 있는 이슈 중 10일 이상 업데이트 되어 있지 않은 이슈들을 대상\n- Jira Comment로 보고자에게 리마인드.",
+        "height": 384,
+        "width": 960,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        816,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "4122f294-7537-42ad-bdea-96c2329072f6",
+      "name": "Sticky Note5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get many issues": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "If 7+days older",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If 10+days older",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many issues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If 7+days older": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Extract Comment Text": {
+      "main": [
+        [
+          {
+            "node": "build issue data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If 10+days older": {
+      "main": [
+        [
+          {
+            "node": "Add a comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many comments": {
+      "main": [
+        [
+          {
+            "node": "Extract Comment Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Qdrant Vector Store2": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "build issue data": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "If not exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If not exists": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Get many comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b7d79128-da93-4d06-8c5a-394798453efb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "ZKpUdpivY8j9Yncm",
+  "tags": []
+}
