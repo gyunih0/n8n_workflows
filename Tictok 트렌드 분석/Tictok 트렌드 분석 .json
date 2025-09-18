@@ -1,0 +1,400 @@
+{
+  "name": "Tictok 트렌드 분석",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "options": {
+          "systemMessage": "=--------------------------\nRoles:\nYou are an AI Agent specialized in generating trend analysis reports from TikTok data.  \nYour task is to analyze the given TikTok dataset and produce a **Markdown-based report**.\nAfter completing the report, send the prepared report using the slack tool.\n\n--------------------------\nPurpose of the report:\nDerivation of viral marketing implications to improve brand awareness and image\n\n--------------------------\nThe report should follow this structure:\n\n# 📊 TikTok 트렌드 분석 보고서\n\n## 1. 보고서 개요\n- 분석 기간: (데이터가 제공되지 않으면 비워둘 것)\n- 분석 대상: TikTok 내 특정 해시태그/키워드 영상\n- 총 분석 영상 수: N개\n- 주요 지표: 조회수(PlayCount), 좋아요(DiggCount), 공유(ShareCount), 댓글(CommentCount), 저장(CollectCount)\n\n---\n\n## 2. 전체 현황 요약\n- 각 지표별 **총합, 평균, 최고 영상**을 표 형식으로 제공\n- 최고 영상은 제목 일부와 ID를 함께 명시\n- **인사이트** 단락 포함 (데이터 특징 요약)\n\n---\n\n## 3. 상위 인기 영상 Top 5\n- 조회수를 기준으로 상위 5개 영상을 선정\n- 표 컬럼: 순위, 영상 제목(요약), 조회수, 좋아요, 공유, 댓글, 저장, 작성자 팬 수\n- **인사이트** 단락 포함 (예: 댓글 비율이 높은 영상, 저장률이 높은 영상)\n\n---\n\n## 4. 작성자(Author) 분석\n- 팬 수(Fans) 기준 Top Author\n- Engagement(좋아요+댓글+공유+저장 합계) 기준 Top Author\n- **인사이트** 단락 포함 (팔로워 수와 영상 파급력의 관계 설명)\n\n---\n\n## 5. 지역(Location) 분석\n- 위치 데이터가 있는 영상만 분석\n- 주요 지역을 표로 나열\n- **인사이트** 단락 포함 (특정 국가/지역 트렌드 강조)\n\n---\n\n## 6. 해시태그 / 콘텐츠 성향\n- 제목과 설명에서 자주 등장하는 해시태그를 추출\n- 콘텐츠 유형 분류 (먹방형 / 챌린지형 / 레시피형 등)\n- **인사이트** 단락 포함\n\n---\n\n## 7. 결론 및 제언\n- 브랜드 이미지와 인지도 상승이 목적\n- 데이터 기반으로 확인된 트렌드 핵심 요약\n- 브랜드/마케팅 시사점 2~3가지 제안\n\n---\n\n--------------------------\nReport Creation Rules: \n1. Be sure to print in **Markdown format**.\n2. The number shall be readable by using a comma(,) in 1,000 units (e.g. 9,000,000)\n3. The table should use the Markdown table format.\n4. The insight part is written in bullet point or simple sentences.\n5. If there is no or insufficient data, specify \"데이터 없음\".\n6. The contents of the report must be written in Korean.\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1648,
+        432
+      ],
+      "id": "cb8f3d84-13a6-45bc-911e-3f5b4ba351ce",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        432
+      ],
+      "id": "feffaa2a-d6ec-453d-9a53-751468a44a7f",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "Run actor and get dataset",
+        "actorId": {
+          "__rl": true,
+          "value": "GdWCkxBtKWOsKjdch",
+          "mode": "list",
+          "cachedResultName": "TikTok Scraper (clockworks/tiktok-scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/GdWCkxBtKWOsKjdch/input"
+        },
+        "customBody": "={\n    \"excludePinnedPosts\": false,\n    \"hashtags\": [\n      \"{{ $json.hashtags }}\"\n    ],\n    \"newestPostDate\": \"{{ $json.newestPostDate }}\",\n    \"oldestPostDateUnified\": \"{{ $json.oldestPostDate }}\",\n    \"profileScrapeSections\": [\n        \"videos\"\n    ],\n    \"profileSorting\": \"popular\",\n    \"proxyCountryCode\": \"None\",\n    \"resultsPerPage\": {{ $json.resultCnt }},\n    \"scrapeRelatedVideos\": false,\n    \"shouldDownloadAvatars\": false,\n    \"shouldDownloadCovers\": false,\n    \"shouldDownloadMusicCovers\": false,\n    \"shouldDownloadSlideshowImages\": false,\n    \"shouldDownloadSubtitles\": false,\n    \"shouldDownloadVideos\": false\n}"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        960,
+        432
+      ],
+      "id": "b73d8c7d-a01d-4430-bfdd-e377fcfa3049",
+      "name": "Run TikTok Scraper Actor",
+      "credentials": {
+        "apifyApi": {
+          "id": "X6iv3EyGOVUzfG2Q",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### 추출 대상\n최근 한 달간 포스팅된 가장 인기있는 틱톡 영상 TOP 10\n\n### 참고\n직접 크롤링 서버를 구축하여 Apify 대체하면 비용 절감 가능.",
+        "width": 368,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        208
+      ],
+      "typeVersion": 1,
+      "id": "153c521a-8285-4169-b6fb-d388e2496e0b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09F799V0UX",
+          "mode": "list",
+          "cachedResultName": "새-채널"
+        },
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_Text', ``, 'string') }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slackTool",
+      "typeVersion": 2.3,
+      "position": [
+        1856,
+        624
+      ],
+      "id": "13036701-4a0f-45e4-894c-8ab25014b43f",
+      "name": "Send a message in Slack",
+      "webhookId": "95c5e486-254e-40be-aee5-129405dd8939",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "GQ3PDZDSfFocnNo4",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        624
+      ],
+      "id": "5d6729c7-aaf3-4259-9d26-daef75dddece",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "4b9A0wVGSHlfntWd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### Apify(Tictok Scrapper)으로 틱톡 데이터셋 추출",
+        "height": 192,
+        "width": 832
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        384
+      ],
+      "typeVersion": 1,
+      "id": "64910214-e3e5-4b34-9b87-d359a488bdeb",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "### 분석 및 보고서 작성",
+        "height": 384,
+        "width": 448,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1552,
+        384
+      ],
+      "typeVersion": 1,
+      "id": "1f70031e-0d17-4b02-8375-3bca80415f96",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef90559d-7dbe-45ea-9e2f-c34632c39320",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "7f74ea48-0e6b-4be8-8805-6c09a056c6bd",
+              "name": "title",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "52b75ae8-b506-4d93-b62c-6cf067d0a7bc",
+              "name": "playCount",
+              "value": "={{ $json.playCount }}",
+              "type": "number"
+            },
+            {
+              "id": "d2f4e208-7d49-4b53-a0ff-49cd500775b3",
+              "name": "diggCount",
+              "value": "={{ $json.diggCount }}",
+              "type": "number"
+            },
+            {
+              "id": "a48fb869-ec4e-40bd-aa6a-cf4de0f169ef",
+              "name": "shareCount",
+              "value": "={{ $json.shareCount }}",
+              "type": "number"
+            },
+            {
+              "id": "d800e3e9-c73b-4546-b636-77080dcea068",
+              "name": "collectCount",
+              "value": "={{ $json.collectCount }}",
+              "type": "number"
+            },
+            {
+              "id": "75b0e8eb-917c-42fc-bd51-4a6504f7089d",
+              "name": "commentCount",
+              "value": "={{ $json.commentCount }}",
+              "type": "number"
+            },
+            {
+              "id": "6ef544ce-21ad-48b6-b658-d2a9dc90572b",
+              "name": "author_heart",
+              "value": "={{ $json.authorMeta.heart }}",
+              "type": "number"
+            },
+            {
+              "id": "44453af7-51d5-4d5a-9bcf-b43cf8c8e6a0",
+              "name": "author_fans",
+              "value": "={{ $json.authorMeta.fans }}",
+              "type": "number"
+            },
+            {
+              "id": "b8df0e75-7e5e-4f09-90b3-807fb78b2f33",
+              "name": "author_following",
+              "value": "={{ $json.authorMeta.following }}",
+              "type": "number"
+            },
+            {
+              "id": "a7fe73b9-1a9f-4620-a889-b5a8a1375e1d",
+              "name": "location",
+              "value": "={{ $json.locationMeta.address }}",
+              "type": "string"
+            },
+            {
+              "id": "da711b6f-f933-409d-94a2-f5af4c42d6c8",
+              "name": "createTimeISO",
+              "value": "={{ $json.createTimeISO }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        432
+      ],
+      "id": "158486f5-7db6-4e13-9960-f6613100bdf5",
+      "name": "Extract Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6b4c6006-ffe8-41c5-9107-1dfc9f2887b6",
+              "name": "hashtags",
+              "value": "buldak",
+              "type": "string"
+            },
+            {
+              "id": "b570a883-cb28-4cb0-a2a1-08ef6235e876",
+              "name": "oldestPostDate",
+              "value": "={{ $now.minus(1, 'months').format('yyyy-MM-dd') }}",
+              "type": "string"
+            },
+            {
+              "id": "ef2bbf78-db07-4b61-8caf-f1c68accefc8",
+              "name": "newestPostDate",
+              "value": "={{ $now.format('yyyy-MM-dd') }}",
+              "type": "string"
+            },
+            {
+              "id": "071a9554-a20f-4979-a552-496f3f40a96c",
+              "name": "resultCnt",
+              "value": 10,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        432
+      ],
+      "id": "76704da6-0f66-4100-858f-406ef99337cc",
+      "name": "Set Scrapper Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        528,
+        432
+      ],
+      "id": "96ff64ee-4e5b-42a9-9233-3e507118ad10",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run TikTok Scraper Actor": {
+      "main": [
+        [
+          {
+            "node": "Extract Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Slack": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Scrapper Fields": {
+      "main": [
+        [
+          {
+            "node": "Run TikTok Scraper Actor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Set Scrapper Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "13c73df7-5512-446e-9a86-3a2add1c2220",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "7l20xYgXkn4KWQ44",
+  "tags": []
+}
