@@ -42,6 +42,11 @@ Google Drive에 업로드된 회의 녹취 파일 생성 이벤트를 감지하�
 
 ---
 
+## 📊 워크플로우
+![img](https://github.com/gyunih0/n8n_workflows/blob/main/%ED%9A%8C%EC%9D%98%20%EB%85%B9%EC%B7%A8%EB%A1%9D%20%EC%9A%94%EC%95%BD%EC%A0%95%EB%A6%AC/WorkFlow%20Image.png?raw=true)
+
+---
+
 ## ⚙️ 워크플로우 동작 순서
 
 1. **파일 감지 및 전사 (STT)**  
