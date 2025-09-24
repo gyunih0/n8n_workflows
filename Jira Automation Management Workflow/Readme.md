@@ -37,6 +37,10 @@
 ### Jira Automation Workflow
 ![img](https://github.com/gyunih0/n8n_workflows/blob/main/Jira%20Automation%20Management%20Workflow/workflow%20Image.png?raw=true)
 
+### RAG chatbot
+![img](https://github.com/gyunih0/n8n_workflows/blob/main/Jira%20Automation%20Management%20Workflow/RAG%20chatbot%20Image.png?raw=true)
+
+
 ---
 
 ## ⚙️ 워크플로우 동작 순서
