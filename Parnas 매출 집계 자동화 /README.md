@@ -28,6 +28,11 @@
 
 ---
 
+## 📊 워크플로우
+![img](https://github.com/gyunih0/n8n_workflows/blob/main/Parnas%20%EB%A7%A4%EC%B6%9C%20%EC%A7%91%EA%B3%84%20%EC%9E%90%EB%8F%99%ED%99%94%20/Workflow%20Image.png?raw=true)
+
+---
+
 ## ⚙️ 워크플로우 동작 순서
 
 1. **워크플로우 시작 (스케줄 트리거)**  
