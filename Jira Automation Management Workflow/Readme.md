@@ -33,6 +33,12 @@
 
 ---
 
+## 📊 워크플로우
+### Jira Automation Workflow
+![img](https://github.com/gyunih0/n8n_workflows/blob/main/Jira%20Automation%20Management%20Workflow/workflow%20Image.png?raw=true)
+
+---
+
 ## ⚙️ 워크플로우 동작 순서
 
 1. **워크플로우 시작 (스케줄 트리거)**  
