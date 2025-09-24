@@ -26,6 +26,11 @@
 
 ---
 
+## 📊 워크플로우
+![img](https://github.com/gyunih0/n8n_workflows/blob/main/Tictok%20%ED%8A%B8%EB%A0%8C%EB%93%9C%20%EB%B6%84%EC%84%9D/Workflow%20Image.png?raw=true)
+
+---
+
 ## ⚙️ 워크플로우 동작 순서
 
 1. **워크플로우 시작**  
