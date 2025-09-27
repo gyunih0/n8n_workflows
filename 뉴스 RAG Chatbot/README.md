@@ -47,6 +47,22 @@
 
 ---
 
+## 📊 워크플로우
+
+### 1. news_rag
+![img](https://github.com/gyunih0/n8n_workflows/blob/main/%EB%89%B4%EC%8A%A4%20RAG%20Chatbot/image/news_rag_img.png?raw=true)
+
+### 2. news_feeds
+![img](https://github.com/gyunih0/n8n_workflows/blob/main/%EB%89%B4%EC%8A%A4%20RAG%20Chatbot/image/news_feeds_img.png?raw=true)
+
+### 3. news_rag_chatbot
+![img](https://github.com/gyunih0/n8n_workflows/blob/main/%EB%89%B4%EC%8A%A4%20RAG%20Chatbot/image/news_rag_chatbot_img.png?raw=true)
+
+### 4. search_tool
+![img](https://github.com/gyunih0/n8n_workflows/blob/main/%EB%89%B4%EC%8A%A4%20RAG%20Chatbot/image/search_tool_img.png?raw=true)
+
+---
+
 ## ⚙️ 워크플로우 동작 순서
 
 ### 1. 뉴스 수집 및 RAG 구축 (`news_rag`)
