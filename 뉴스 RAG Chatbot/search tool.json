@@ -1,0 +1,300 @@
+{
+  "name": "search tool",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        160
+      ],
+      "id": "269f9b63-a8a7-440b-a75f-815f6b496968",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "url": "https://openapi.naver.com/v1/search/blog",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.query }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Naver-Client-Id",
+              "value": "KDek7eKAKgdOVQ4T7ryM"
+            },
+            {
+              "name": "X-Naver-Client-Secret",
+              "value": "CabFKWtNEz"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        16,
+        160
+      ],
+      "id": "cc69351c-54eb-4c9b-8a27-e8a9d8378f5b",
+      "name": "NaverBlog"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/customsearch/v1",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "cx",
+              "value": "e2d302b4f4e8b4bc7"
+            },
+            {
+              "name": "key",
+              "value": "AIzaSyBqGWK101JhFPTKysAfYOs5N_Y2KrVSONE"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.query }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        16,
+        320
+      ],
+      "id": "139d7c06-75d2-4038-98fb-4a37544adf88",
+      "name": "GoogleSearch"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        272,
+        144
+      ],
+      "id": "16ebb7e6-ff06-46a9-a2b9-8fee6160820e",
+      "name": "Merge"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        448
+      ],
+      "id": "57f1a05b-2061-4fbd-a4a4-f08c4da41963",
+      "name": "When clicking ‘test workFlow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "df9e2d25-9ed0-44c7-845a-4a6182f283dd",
+              "name": "query",
+              "value": "최신영화",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        448
+      ],
+      "id": "418c9c76-9374-4dbe-b605-5a5f74bbfc8f",
+      "name": "Edit Fields",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "items"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        480,
+        160
+      ],
+      "id": "64deee52-8f48-4b57-afd6-f92908c95598",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "url": "https://openapi.naver.com/v1/search/webkr",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.query }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Naver-Client-Id",
+              "value": "KDek7eKAKgdOVQ4T7ryM"
+            },
+            {
+              "name": "X-Naver-Client-Secret",
+              "value": "CabFKWtNEz"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        16,
+        0
+      ],
+      "id": "921d8f2f-4cdf-4083-99ab-626bd18ad22f",
+      "name": "NaverWeb"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "NaverBlog",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GoogleSearch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "NaverWeb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NaverBlog": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "GoogleSearch": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "When clicking ‘test workFlow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "NaverBlog",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GoogleSearch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "NaverWeb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NaverWeb": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c05de4bd-1888-4bc1-abe9-f68b9d54aee5",
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "YuHzXa09hMhuqaFs",
+  "tags": []
+}

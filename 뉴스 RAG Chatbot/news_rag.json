@@ -1,0 +1,540 @@
+{
+  "name": "news_rag",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "81518b16-d4b1-4525-9e43-4730019e276e",
+              "name": "feed",
+              "value": "=[\n    {\n      \"category\": \"최신\",\n      \"url\": \"http://www.yonhapnewstv.co.kr/browse/feed/\"\n    },\n    {\n      \"category\": \"헤드라인\",\n      \"url\": \"http://www.yonhapnewstv.co.kr/category/news/headline/feed/\"\n    },\n    {\n      \"category\": \"정치\",\n      \"url\": \"http://www.yonhapnewstv.co.kr/category/news/politics/feed/\"\n    },\n    {\n      \"category\": \"경제\",\n      \"url\": \"http://www.yonhapnewstv.co.kr/category/news/economy/feed/\"\n    },\n    {\n      \"category\": \"사회\",\n      \"url\": \"http://www.yonhapnewstv.co.kr/category/news/society/feed/\"\n    },\n    {\n      \"category\": \"지역\",\n      \"url\": \"http://www.yonhapnewstv.co.kr/category/news/local/feed/\"\n    },\n    {\n      \"category\": \"세계\",\n      \"url\": \"http://www.yonhapnewstv.co.kr/category/news/international/feed/\"\n    },\n    {\n      \"category\": \"문화ㆍ연예\",\n      \"url\": \"http://www.yonhapnewstv.co.kr/category/news/culture/feed/\"\n    },\n    {\n      \"category\": \"스포츠\",\n      \"url\": \"http://www.yonhapnewstv.co.kr/category/news/sports/feed/\"\n    },\n    {\n      \"category\": \"날씨\",\n      \"url\": \"http://www.yonhapnewstv.co.kr/category/news/weather/feed/\"\n    }\n  ]\n  ",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        64
+      ],
+      "id": "70887f52-11aa-4c2e-97ec-cad1c73eaa09",
+      "name": "Rss Feeds Urls"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "feed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        416,
+        64
+      ],
+      "id": "eaf9a659-98d6-426d-bed1-b198b9547e06",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        80
+      ],
+      "id": "3f79c4ec-0f3f-4e6e-840f-0133e8a723fa",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        608,
+        64
+      ],
+      "id": "1bc8238b-6d7f-4f59-8d30-be4610405094",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "={{ $json.link }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        672,
+        272
+      ],
+      "id": "ac7ab886-e785-473c-9e20-f3a25c956432",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "noFzADaAsl3vJwkz",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8624c379-4c60-4894-b35e-de23f028072e",
+              "leftValue": "={{ $json.propertyName === null}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        848,
+        272
+      ],
+      "id": "2886deac-88a5-4b5e-972d-9c92a87ade37",
+      "name": "IsNULL"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('RSS Read').item.json.link }}",
+        "value": "={{ $('RSS Read').item.json.pubDate }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        256
+      ],
+      "id": "83baf308-3c34-4fef-8aff-664aaee7ccdd",
+      "name": "Redis1",
+      "credentials": {
+        "redis": {
+          "id": "noFzADaAsl3vJwkz",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Redis Key로 중복 뉴스 저장 방지",
+        "height": 128,
+        "width": 182,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1024,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "fdc2af4c-508b-4382-b4d8-4c3a47cbad76",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 뉴스 데이터를 Vector DB로 업데이트\n",
+        "height": 704,
+        "width": 1088
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        -16
+      ],
+      "typeVersion": 1,
+      "id": "6a514654-6812-4337-8f53-a1e5ede144fc",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1232,
+        256
+      ],
+      "id": "c6972b3f-d54f-4449-a8b3-a2871b0cb21f",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "EAPIK5MffbAbmOZS",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1168,
+        464
+      ],
+      "id": "f7d192d8-6832-400e-a31d-02fa57b21d78",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "4b9A0wVGSHlfntWd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkSize": 3000,
+        "chunkOverlap": 500,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        592
+      ],
+      "id": "afc452b9-0ecc-4700-9f3d-2464649daf07",
+      "name": "Recursive Character Text Splitter1"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "=날짜:  {{ $('RSS Read').item.json.pubDate }}\n제목: {{ $('RSS Read').item.json.title }}\n카테고리: {{ $('RSS Read').item.json.categories[0] }}\n내용: {{ $('RSS Read').item.json['content:encodedSnippet'] }}",
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "pubDate",
+                "value": "={{ $('RSS Read').item.json.pubDate }}"
+              },
+              {
+                "name": "link",
+                "value": "={{ $('RSS Read').item.json.link }}"
+              },
+              {
+                "name": "title",
+                "value": "={{ $('RSS Read').item.json.title }}"
+              },
+              {
+                "name": "category",
+                "value": "={{ $('RSS Read').item.json.categories[0] }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1344,
+        464
+      ],
+      "id": "26c21e49-bc50-420c-a40e-34b0d8f6616c",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "content": "## 실패 사례\n### supabase DB를 활용한 임베딩 중복 방지.\n- 뉴스의 key를 따로 DB에 저장하여  Redis 대신 사용하고자 하였으나, supabase node의 Get a row는 여러 item이 input 되어도 하나의 item만 output되는 구조로 사용이 불가능 하였다.\n- 이를 해결하고자 Loop 안에 Loop를 사용해서 해결하려고 하였으나, 안쪽 loop가 한번의 주기가 마무리되면 더 이상 동작할 수 없는 케이스를 확인하였다.\n- n8n에서 loop를 중첩해 사용하는 것은 권장되지 않으며, 하위 워크플로우 분리 또는 코드 노드를 활용하는 것이 실무적으로 가장 효과적인 해결책이다.\n- Redis node는 input items만큼 실행되므로 Redis로 진행함.",
+        "height": 384,
+        "width": 304,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        224,
+        256
+      ],
+      "typeVersion": 1,
+      "id": "290d17be-651f-438c-8fc9-4a4a1437cc52",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "eqYGJygeRyJowiB4",
+          "mode": "list",
+          "cachedResultName": "009-news-feeds"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1392,
+        -192
+      ],
+      "id": "f2e18c14-3c97-4378-bb91-4c7d8f9275f9",
+      "name": "최신뉴스 정리 전송"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        -192
+      ],
+      "id": "941bc301-a26c-4846-990b-6efa886994d3",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        64
+      ],
+      "id": "24d88e3d-f7a4-47cd-8520-8e61bd0cf73f",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## 최신 뉴스 정리 Work Flow 실행",
+        "height": 240,
+        "width": 512,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1104,
+        -272
+      ],
+      "typeVersion": 1,
+      "id": "84d8cb88-00d2-41a9-bbf3-7634f9e35e16",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Rss Feeds Urls": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "IsNULL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IsNULL": {
+      "main": [
+        [
+          {
+            "node": "Redis1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis1": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "최신뉴스 정리 전송",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Rss Feeds Urls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d8ff4ea5-1837-4fdc-ac5a-dfd42f4e10c1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "3S5SADYNDcfap8FK",
+  "tags": []
+}

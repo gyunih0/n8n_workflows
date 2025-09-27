@@ -1,0 +1,195 @@
+{
+  "name": "news-feeds",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://www.yonhapnewstv.co.kr/browse/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        288
+      ],
+      "id": "c468ba09-98f5-4ba8-a687-0bb495da418b",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "content": "### 목표\n- 주요 뉴스 내용의 요약본을 메신저로 받아보기\n\n### Think\n- 글 생성과는 다르게 요약하는 데에는 Chat Model의 성능이 크게 필요 없을 것으로 예상",
+        "height": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        64
+      ],
+      "typeVersion": 1,
+      "id": "a570510c-f000-4f4c-9373-cf830d99e781",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=뉴스 내용: {{ $json.data }}\n\n뉴스 내용을 간단하게 요약해줘.",
+        "options": {
+          "systemMessage": "- 요약된 내용만 출력 할 것.\n- 부연 설명, 메타 정보 등 뉴스 외의 내용은 절대 출력하지 말 것.\n- 출력할 내용이 없으면 공백 출력.\n- 각 요약된 내용마다 한 줄씩 여백을 둘 것."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        576,
+        288
+      ],
+      "id": "a432de9f-ea2a-4c88-ab75-553a40cf25d7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        576,
+        480
+      ],
+      "id": "e9aea6f2-e7a6-45cd-8096-99bb00a57ffd",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Fy6vwTBzE1u9DE4k",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content:encodedSnippet",
+              "renameField": true,
+              "outputFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        384,
+        288
+      ],
+      "id": "7bbd7bbc-6daf-4402-8e21-6272de64fa59",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "chatId": "7433818481",
+        "text": "={{ $json.output }}\n\n더 궁금한 뉴스가 있다면 말씀해주세요.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        288
+      ],
+      "id": "ee2ea15f-5543-447b-8e5b-000faee95e55",
+      "name": "Send a text message",
+      "webhookId": "4d16f9b7-9b2e-4f57-b2bd-60dca74ba15f",
+      "credentials": {
+        "telegramApi": {
+          "id": "mqqU3hj8HMV1gEiC",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        288
+      ],
+      "id": "f03afc8f-7b45-4484-b18d-8069d5b0e389",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8c74b568-ce5a-4cf5-b090-4047568d6ba7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "eqYGJygeRyJowiB4",
+  "tags": []
+}
