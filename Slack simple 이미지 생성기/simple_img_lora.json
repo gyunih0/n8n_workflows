@@ -1,0 +1,500 @@
+{
+  "name": "simple_img_lora",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.blocks[0].elements[0].elements[1].text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# AI 이미지 프롬프트 생성용 시스템 프롬프트\n\n당신은 이미지 생성 모델(예: Replicate, Stable Diffusion, DALL·E 등)에 전달할 텍스트 프롬프트를 만들어주는 전문 프롬프트 엔지니어입니다.  \n사용자가 전달한 설명이나 요구사항을 분석하여, 이미지 모델이 높은 품질의 이미지를 생성할 수 있도록 구체적이고 시각적인 프롬프트를 작성하는 것이 당신의 역할입니다.\n\n---\n\n## 역할과 목표\n\n1. **역할:**  \n   - 사용자가 입력한 주제, 장면, 스타일, 분위기 등을 바탕으로 이미지 생성용 텍스트 프롬프트를 작성합니다.  \n   - 프롬프트는 AI가 최대한 정확하고 세밀한 이미지를 생성할 수 있도록 시각적 요소를 풍부하게 포함해야 합니다.\n\n2. **목표:**  \n   - 단순한 키워드 나열이 아닌, 구체적이고 묘사적인 영어 문장을 작성합니다.  \n   - 결과물은 이미지 생성 모델에 그대로 전달 가능한 수준의 프롬프트여야 합니다.\n\n---\n\n## 프롬프트 작성 규칙\n\n- **언어:** 이미지 생성 모델은 영어를 더 잘 이해하므로, 최종 프롬프트는 반드시 영어로 작성합니다.  \n- **구성:** 다음 요소들을 포함하도록 합니다 (가능한 경우 전부 포함):  \n  - **Main subject (주제):** 이미지의 핵심 대상 (예: a cyberpunk city, a medieval warrior, a cute cat, etc.)  \n  - **Environment / Background (배경):** 장면의 배경과 주변 환경 (예: neon-lit streets, a misty forest, a sunny beach)  \n  - **Details & Attributes (세부 묘사):** 색상, 표정, 의상, 소품, 질감 등 (예: wearing futuristic armor, holding a glowing sword)  \n  - **Mood / Atmosphere (분위기):** 전체적인 느낌 (예: dramatic, peaceful, mysterious, cinematic)  \n  - **Art Style (스타일):** 원하는 스타일 (예: photorealistic, digital painting, anime style, watercolor)  \n  - **Camera & Composition (선택 사항):** 촬영 구도나 시점 (예: close-up portrait, wide shot, from above)\n\n- **톤:** 간결하면서도 묘사적인 영어 문장 (1~5문장)을 작성합니다. 쉼표로 나열된 구체적 표현을 적극 사용합니다.  \n- **금지:** 사용자 요청 외의 내용을 임의로 추가하거나 창작하지 않습니다. 불필요한 서술어, 감정 표현, 대화체를 사용하지 않습니다.\n\n---\n\n## 이미지 비율 설정 규칙\n- 이미지 비율(ratio)는 반드시 16:9, 21:9, 3:2, 2:3, 4:5, 5:4, 3:4, 4:3, 9:16, 9:21 중 한가지여야 합니다.\n- 이미지 비율에 대한 언급이 없으면 이미지 비율은 ratio값은 1:1로 설정합니다.\n\n## 로라(lora) 설정 규칙\n- 특별한 스타일이 없는 경우 미드저니 스타일을 기본값으로 할 것.\n\n### Lora 목록\n- 만화, 애니메이션, 카툰 스타일\n  - 주소(lora_weights): huggingface.co/openfree/flux-chatgpt-ghibli-lora\n  - trigger: ghibli\n- 미드저니(디폴트)\n  - 주소(lora_weights): huggingface.co/strangerzonehf/Flux-Midjourney-Mix2-LoRA\n  - trigger: MJ v6\n- 리얼리즘, 실사 스타일\n  - 주소(lora_weights): huggingface.co/strangerzonehf/Flux-Super-Realism-LoRA\n  - trigger: Super Realism\n\n---\n\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -80,
+        -64
+      ],
+      "id": "5b322509-ca98-483b-baae-9c1564b6cfde",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        128
+      ],
+      "id": "c0abfab2-153e-48e2-bb22-034c08b6379c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "4b9A0wVGSHlfntWd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.replicate.com/v1/models/black-forest-labs/flux-schnell-lora/predictions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "wait"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"input\": {\n      \"prompt\": \"{{ $json.output.trigger_words }}, {{ $json.output.prompt }}\",\n      \"go_fast\": false,\n      \"lora_scale\": 0.8,\n      \"megapixels\": \"1\",\n      \"num_outputs\": 1,\n      \"aspect_ratio\": \"{{ $json.output.ratio }}\",\n      \"lora_weights\": \"{{ $json.output.lora_weights }}\",\n      \"output_format\": \"png\",\n      \"output_quality\": 80,\n      \"num_inference_steps\": 4,\n      \"disable_safety_checker\": true\n    }\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        272,
+        -64
+      ],
+      "id": "2a30854c-72e5-40a7-ac56-15ec9ab7e6b1",
+      "name": "Generate Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zfgeZshp3AGNm6MQ",
+          "name": "Header Auth account"
+        },
+        "httpBearerAuth": {
+          "id": "CbCfrJcsi00T6YKM",
+          "name": "replicate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.replicate.com/v1/predictions/{{ $('Generate Image').item.json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "f4e625f0-138f-42ef-b811-a98b4c9c26a0",
+      "name": "Get Status",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zfgeZshp3AGNm6MQ",
+          "name": "Header Auth account"
+        },
+        "httpBearerAuth": {
+          "id": "CbCfrJcsi00T6YKM",
+          "name": "replicate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.output[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1072,
+        -192
+      ],
+      "id": "4bfbbae1-fc92-4afa-bf83-a1db301bd20e",
+      "name": "Get Image"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        0
+      ],
+      "id": "923fb866-5d4e-4236-b31a-7e23346b05b1",
+      "name": "polling"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"prompt\": \"이미지 프롬프트\",\n  \"ratio\": \"16:9\",\n  \"lora_weights\": \"로라 주소\",\n  \"trigger_words\": \"트리거\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        128
+      ],
+      "id": "8f2874c6-e62c-47a8-bd1d-cd2b75161274",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "succeeded",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f70746c8-7fa4-4e93-ac0e-05869aab8cb1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "succeeded"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "68cf7268-35b5-4c07-b3ea-008c1dfbf28f",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8a9a7829-f392-44ff-8fd5-ec7e26b445ac",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "failed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        800,
+        -16
+      ],
+      "id": "5f55acb0-dcdd-4669-ac5c-4c8bc952f73f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "trigger": [
+          "message",
+          "app_mention"
+        ],
+        "watchWorkspace": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        -64
+      ],
+      "id": "c013c313-b706-4b31-9cc2-88202518dcb4",
+      "name": "Slack Trigger",
+      "webhookId": "c1bc97f8-2594-44c6-a4de-5a674cf3eb7d",
+      "credentials": {
+        "slackApi": {
+          "id": "5WvLpZNnhvExalCc",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "options": {
+          "channelId": "C09HWBK9CUW"
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1312,
+        -192
+      ],
+      "id": "a1a16117-e86d-4a8f-967f-4e93b61b99bf",
+      "name": "Upload a file",
+      "webhookId": "02c6e92a-e67f-472e-9a37-3080aa646d78",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "GQ3PDZDSfFocnNo4",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09HWBK9CUW",
+          "mode": "list",
+          "cachedResultName": "이미지-생성기"
+        },
+        "text": "=이미지 생성중.. \n잠시만 기다려주세요.",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -64,
+        -240
+      ],
+      "id": "3b52aa67-ce1d-4e46-b834-f21b8898ce44",
+      "name": "Send a message",
+      "webhookId": "2bff22f4-6bd3-4376-99e9-52fab7e4f38f",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "GQ3PDZDSfFocnNo4",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        -64
+      ],
+      "id": "09cd113e-76c4-4426-a685-439566ff9e42",
+      "name": "Wait",
+      "webhookId": "31e89531-d0da-4dcc-a17e-a53d184b927e"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.user }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        128
+      ],
+      "id": "83c529a0-73dd-47e2-ac16-7a82c573dad5",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Status": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "polling": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "polling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image": {
+      "main": [
+        [
+          {
+            "node": "Upload a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3ee4f323-a2c4-463b-b1c2-e0fa10fdccd9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "hC0WioWTbgNIdAU2",
+  "tags": []
+}
