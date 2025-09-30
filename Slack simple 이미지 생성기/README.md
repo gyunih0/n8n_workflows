@@ -39,6 +39,9 @@ Slack 메시지를 입력받아 → AI가 프롬프트를 생성 → Replicate �
 
 ---
 
+## 📊 워크플로우
+![img](https://github.com/gyunih0/n8n_workflows/blob/main/Slack%20simple%20%EC%9D%B4%EB%AF%B8%EC%A7%80%20%EC%83%9D%EC%84%B1%EA%B8%B0/simple_img_lora%20image.png?raw=true)
+
 ## ⚙️ 워크플로우 동작 순서
 
 1. **Slack Trigger**  
