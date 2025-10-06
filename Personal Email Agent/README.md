@@ -36,7 +36,7 @@ Naver Mail과 Gmail에서 수신된 이메일을 트리거로 감지하여 **이
 ---
 
 ## 📊 워크플로우 개요
-
+![img](https://github.com/gyunih0/n8n_workflows/blob/main/Personal%20Email%20Agent/Workflow%20Image.png?raw=true)
 
 ---
 
