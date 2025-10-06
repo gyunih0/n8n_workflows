@@ -1,0 +1,1111 @@
+{
+  "name": "personal-email-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "postProcessAction": "nothing",
+        "format": "resolved",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2.1,
+      "position": [
+        -192,
+        -48
+      ],
+      "id": "8cf9953d-8cc6-4447-b5c0-b9266297c397",
+      "name": "NaverMail Trigger",
+      "credentials": {
+        "imap": {
+          "id": "LwDBek3MSRQ6OsaS",
+          "name": "Naver IMAP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6f53354b-b2cb-49e8-b728-152581ff0024",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "fa8c0d46-f66c-4bb7-be73-1420bbeba861",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "a2805a57-a5fc-4900-81c0-355279bedb62",
+              "name": "uid",
+              "value": "={{ $json.attributes.uid }}",
+              "type": "number"
+            },
+            {
+              "id": "6e9eddac-640c-42b7-9c9b-b3214c1f84e0",
+              "name": "FromEmail",
+              "value": "={{ $json.from.value[0].address }}",
+              "type": "string"
+            },
+            {
+              "id": "cb09cb4f-4d8b-487d-b47b-4925ea0655ed",
+              "name": "FromName",
+              "value": "={{ $json.from.value[0].name }}",
+              "type": "string"
+            },
+            {
+              "id": "4ddcd4c3-06a0-48bb-a606-76ef12cfb8ab",
+              "name": "domain",
+              "value": "naver",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        -48
+      ],
+      "id": "473eb043-dffc-4f25-a12e-a29cf6332ac1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "be9984854b7d91c83f2198024bf72c21961ec8f27ee5cc6fc01d87c1bd4575a4@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "N8N TEST"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('attendees0_Attendees', ``, 'string') }}"
+          ],
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1776,
+        592
+      ],
+      "id": "fe5267ae-af97-4538-b935-e1f9077dfe6a",
+      "name": "Cal-Write",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "DnUQlxREVlw2v0yU",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1f37583f-e649-479e-a75d-a4d4f464a9fd",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "08ed6de1-b292-4e35-a8fb-afecba428029",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "e1d3a3ba-b676-426f-a8ba-21700badfb2b",
+              "name": "emailId",
+              "value": "={{ $json.uid }}",
+              "type": "number"
+            },
+            {
+              "id": "2a8ac618-f506-4377-93ce-1e1b45b499ba",
+              "name": "from",
+              "value": "={{ $json.FromEmail }}",
+              "type": "string"
+            },
+            {
+              "id": "8d2924b5-6d68-4637-aa46-c4b90bf52485",
+              "name": "fromName",
+              "value": "={{ $json.FromName }}",
+              "type": "string"
+            },
+            {
+              "id": "9a3a327b-ba51-49fc-8aac-8c6e8b67923d",
+              "name": "domain",
+              "value": "={{ $json.domain }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        32
+      ],
+      "id": "98efa7da-985e-4516-9014-47bb3a6f452b",
+      "name": "Mail Data"
+    },
+    {
+      "parameters": {
+        "content": "### 개선점\n- spam 처리 등 다른 카테고리에 따른 처리 프로세스 추가 가능\n",
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -256,
+        -304
+      ],
+      "typeVersion": 1,
+      "id": "ec52675c-c632-40a7-a406-7ef1066cc606",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "ggyunih0@gmail.com",
+          "mode": "list",
+          "cachedResultName": "ggyunih0@gmail.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1248,
+        320
+      ],
+      "id": "6d01bc1a-9ffd-451e-8624-f8f75df68a99",
+      "name": "Cal-Read",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "DnUQlxREVlw2v0yU",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "spam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3ca565e4-c730-43e6-9a60-4c5eed9fbb74"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "spam"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ab93ab0d-e1f8-4575-b066-ad2b732f55ee",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "meeting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "meeting"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        736,
+        32
+      ],
+      "id": "93a8cccb-eeac-4068-aefb-9e1f29a30853",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "7433818481",
+        "message": "={{ $json.output.message }}\n{{ $json.output.existing_schedule_summary }}",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "schedule",
+              "fieldType": "checkbox",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "={{ $json.output.recommend_schedule[0] }}"
+                  },
+                  {
+                    "option": "={{ $json.output.recommend_schedule[1] }}"
+                  },
+                  {
+                    "option": "={{ $json.output.recommend_schedule[2] }}"
+                  },
+                  {
+                    "option": "선택하지 않음"
+                  }
+                ]
+              },
+              "limitSelection": "range",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "messageButtonLabel": "일정 선택하기"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        112
+      ],
+      "id": "ac0e55ba-5d33-4f32-9734-6a6535823302",
+      "name": "Send message and wait for response",
+      "webhookId": "bc26ee01-5ea1-450e-9dd1-1aa1a77354a1",
+      "credentials": {
+        "telegramApi": {
+          "id": "mqqU3hj8HMV1gEiC",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "timezone": "Asia/seoul"
+        }
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        320
+      ],
+      "id": "6f08160a-8505-4574-a6dd-e0c9fd730d70",
+      "name": "current-date"
+    },
+    {
+      "parameters": {
+        "content": "### 캘린더를 확인하고 미팅 가능한 일정 추천",
+        "height": 416,
+        "width": 544,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        944,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "0632d6f8-5d8b-4960-a16a-a781230d3dab",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "### 사용자에게 미팅 요청 내용과 추천 일정 전달 후 승인 대기 (Human Validation)",
+        "height": 256,
+        "width": 384,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1520,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "cd5994f8-107a-4d81-bd76-4997c7b60c81",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2804d76f-4355-47a3-9d38-3ec95a7ea0eb",
+              "leftValue": "={{ $json.data.schedule[0] }}",
+              "rightValue": "선택하지 않음",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1728,
+        112
+      ],
+      "id": "dfc9b0b1-350f-4b05-9f68-8ae543202c6b",
+      "name": "IfConfirmed"
+    },
+    {
+      "parameters": {
+        "content": "### 승인된 일정으로 캘린더에 일정 등록 및 답변 & 초대 이메일 전송",
+        "height": 416,
+        "width": 496,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1520,
+        336
+      ],
+      "typeVersion": 1,
+      "id": "8d4a22f7-5800-4d79-9a14-32fdaa32855f",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Mail Data').item.json.from }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1888,
+        592
+      ],
+      "id": "978c8dbd-c971-446b-a835-226018895bf2",
+      "name": "Send a message in Gmail",
+      "webhookId": "4dba0cad-3187-4e3e-92c4-09e8e79d097c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "qpFBhhIs4r2JzQr9",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {
+          "frequencyPenalty": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        208
+      ],
+      "id": "47874349-a474-4729-a170-6f43c3a79920",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "4b9A0wVGSHlfntWd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"category\": \"이메일 내용 분류 카테고리\",\n  \"reason\": \"분류한 이유\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        208
+      ],
+      "id": "0d960e5c-6b85-41a8-959c-502615a55d6b",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        320
+      ],
+      "id": "5dae3936-84cf-414b-8248-cdaa3351236d",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "4b9A0wVGSHlfntWd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"email_summary\": \"이메일 요약 내용\",\n  \"message\": \"10월 13일 (월) 10:00 ~ 11:00 어떤 내용에 관한 미팅 요청 이메일이 수신 되었습니다. 일정을 선택해 주시면 자동으로 일정을 등록하고 답변 이메일을 작성, 전달하겠습니다.\",\n  \"existing_schedule_summary\": \"10월 13일 나의 일정: 10:00~11:00 팀 회의, 14:00~15:00 고객 미팅\",\n  \"recommend_schedule\": [\n    \"2025-10-13 10:30:00\",\n    \"2025-10-13 11:00:00\",\n    \"2025-10-13 14:00:00\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1360,
+        320
+      ],
+      "id": "905f4f82-33cc-47d1-a7d5-f1c8f69eb5aa",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        592
+      ],
+      "id": "8a548e8c-3ccc-4a6b-be30-3afb4d3085fe",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "4b9A0wVGSHlfntWd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=메일 제목:\n{{ $('Mail Data').item.json.subject }}\n\n메일 내용:\n{{ $('Mail Data').item.json.text }}\n\n보낸사람 이메일 주소:\n{{ $('Mail Data').item.json.from }}\n\n보낸사람 이름:\n{{ $('Mail Data').item.json.fromName }}\n\nuid:\n{{ $('Mail Data').item.json.uid }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=# 역할\n\n당신은 n8n 워크플로우에 연결된 AI 에이전트입니다.  \n당신의 역할은 이메일 내용을 분석하여 **스팸 여부**, **일정/미팅 관리 필요 여부**, 혹은 **일반 메시지**인지 분류하는 것입니다.  \n\n---\n\n# 입력 형식\n- text(이메일 본문): 내용이 없는 경우에는 subject를 분석하여 판단합니다.\n\n# 동작 규칙\n\n1. **스팸(Spam) 분류 기준**  \n   - 광고성, 피싱, 사기성, 불필요한 마케팅 메일  \n   - 지나치게 과장된 홍보, 의심스러운 링크/파일 포함  \n   - 채용 관련 마케팅 메일은 포함하지 않는다.\n\n2. **일정/미팅 관리 분류 기준**  \n   - 회의 일정, 미팅 요청, 초대장, 일정 변경/확인 요청  \n   - 행사, 웨비나, 컨퍼런스 초대 메일  \n   - 캘린더 등록이나 캘린더 확인이 필요한 경우\n\n3. **일반 메시지 분류 기준**  \n   - 스팸도 아니고 일정 관리가 필요하지 않은 메일\n\n---\n\n# 출력 형식\n\n- 분석 결과는 반드시 아래 JSON 형태로 출력합니다:\n\n{\n  \"category\": \"spam | meeting | normal\",\n  \"reason\": \"분류 근거를 한국어로 간단히 설명\"\n}\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        432,
+        32
+      ],
+      "id": "143aae90-87c3-4253-8831-10d5e36696ea",
+      "name": "Email Categorize"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=이메일 제목:  {{ $('Mail Data').item.json.subject }}\n이메일 본문: {{ $('Mail Data').item.json.text }}\n작성자: {{ $('Mail Data').item.json.from }}\n작성자 이름: {{ $('Mail Data').item.json.fromName }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# 역할\n당신은 이메일 기반 일정관리 전문 AI Agent입니다.  \n이전 노드에서 이미 \"일정 관리가 필요한 이메일\"로 판별된 이메일만 입력으로 받습니다.\n\n---\n\n# 목표\n1. **현재 시간 기준점 확인**  \n   - 반드시 `current-date` 툴을 사용하여 현재 날짜·시간을 획득합니다.\n\n2. **이메일 분석**  \n   - 이메일 제목과 본문을 분석하여 회의 또는 미팅 요청 여부, 요청된 일자/시간, 요청 목적을 추출합니다.\n\n3. **해당 날짜의 일정 조회 및 요약**  \n   - 요청된 일자가 확인되면 `Cal-read` 툴을 사용하여 그 **날짜 전체의 나의 일정**을 조회합니다.\n   - 조회한 일정을 간단히 요약하여 출력에 포함시킵니다.  \n\n4. **일정 충돌 확인**  \n   - 요청된 시간대가 기존 일정과 겹치는지 판별합니다.\n\n5. **추천 일정 제안**  \n   - 일정 등록이 가능한 추천 일정을 3가지 제시합니다.\n   - 규칙:\n     - 요청된 일자·시간이 가능하다면 그대로 추천합니다.\n     - 불가능할 경우 비슷한 날짜/시간으로 추천합니다.\n     - 가급적 평일에 추천합니다.\n     - 시간대는 **10:00~12:00**, **13:00~18:00** 사이를 우선합니다.\n\n6. **출력 형식**  \n   - email_summary에는 수신된 이메일의 내용 요약을 담습니다.\n   - message에는 수신된 이메일의 핵심 내용을 요약하여 안내문 형태로 작성합니다. \n     - 이메일의 요약문과 \"일정을 선택해 주시면 자동으로 일정을 등록하고 답변 이메일을 작성, 전달하겠습니다.\" 의 내용을 반드시 포함할 것.\n   - recommend_schedule에는 ISO 형식(YYYY-MM-DD HH:mm:ss)의 3가지 추천 일정을 배열로 작성합니다.\n   - existing_schedule_summary 필드는 반드시 해당 날짜의 나의 일정 요약을 담습니다.\n\n7. **주의사항**\n   - 불필요한 설명이나 다른 텍스트를 추가하지 않습니다.\n   - 일정 추천은 현실적으로 가능한 시간대만 제시해야 합니다.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        112
+      ],
+      "id": "11b43903-98b5-4bbc-b3f6-c3843cbb1efa",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=승인된 일정: {{ $json.data.schedule[0] }}\n메일 요약내용: {{ $('AI Agent').item.json.output.email_summary }}\n일정 요청자 이메일: {{ $('Mail Data').item.json.fromName }}\n일정 요청자 이름: {{ $('Mail Data').item.json.fromName }}",
+        "options": {
+          "systemMessage": "=# 역할\n당신은 일정 등록 및 답변 이메일 발송을 담당하는 AI Agent입니다.  \n입력으로 이미 승인된 일정 정보와 메일 요약, 요청자 정보가 주어집니다.\n\n---\n\n# 목표\n1. **일정 등록 (Cal-write)**  \n   - 승인된 일정을 기준으로 나의 캘린더에 일정을 등록합니다.\n      - 반드시 Asia/Seoul 시간대를 기준으로 일정을 등록합니다.\n   - 참석자: 일정 요청자 이메일을 초대합니다.\n\n2. **답변 이메일 작성 및 전송 (Send a message in Gmail)**  \n   - 일정 등록 후 생성된 초대 링크(Calendar event link)를 활용합니다.  \n   - 회신 메일의 제목은 항상 \"[Re]\"를 붙여 원래 제목을 인용하되, 언제 어떤 미팅인지 요약해서 명확히 기재합니다.\n     - 예: \"[Re]8월 15일 AI Agent Build에 관한 미팅의 건\"\n   - 메일 수신자: 일정 요청자 이메일  \n   - 메일 본문(한글 고정):\n     ```\n     안녕하세요, {{ $('Mail Data').item.json.fromName }}님.\n\n     요청하신 일정이 아래와 같이 확정되었습니다.\n\n     📅 일정: [캘린더에 등록한 일정]\n     📄 내용: [미팅, 회의 내용]\n\n     아래 초대 링크를 통해 캘린더 일정을 확인하실 수 있습니다.  \n     [등록된 캘린더 초대 링크]\n\n     감사합니다.\n     ```\n   - 반드시 `Send a message in Gmail` 툴을 사용하여 전송합니다.\n\n---\n\n# 주의사항\n- 반드시 `Cal-write` → `Send a message in Gmail` 순서로 실행합니다.  \n- `calendar_event_link`는 Cal-write 툴에서 생성된 실제 초대 링크를 사용합니다.  \n- 불필요한 설명이나 다른 텍스트를 추가하지 않습니다.  \n- 메일 본문은 이메일로 깔끔하게 보일 수 있도록 html 형식으로 정리하여 전송합니다.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        384
+      ],
+      "id": "cc9dc6fc-1a07-494d-b829-79b55d164977",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "content": "## Email Trigger",
+        "height": 368,
+        "width": 592,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -256,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "2817dfaf-3ca6-474d-9f83-7ccf95f0d7cf",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 이메일 카테고리 분류\n1. 스팸 이메일\n2. 미팅 및 일정 관리가 필요한 이메일\n3. (추후 확장 가능)",
+        "height": 432,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "097c14f5-a006-4d44-ab50-732c9c149a58",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "authentication": "coreImapAccount",
+        "resource": "email",
+        "operation": "moveEmail",
+        "sourceMailbox": {
+          "__rl": true,
+          "mode": "list",
+          "value": "INBOX"
+        },
+        "emailUid": "={{ $('Mail Data').item.json.emailId }}",
+        "destinationMailbox": {
+          "__rl": true,
+          "value": "[Gmail]/스팸함",
+          "mode": "list",
+          "cachedResultName": "[Gmail]/스팸함"
+        }
+      },
+      "type": "n8n-nodes-imap.imap",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        -160
+      ],
+      "id": "fa68f1a4-4b99-4c86-aafa-477455e381d2",
+      "name": "MoveGmailEmail",
+      "credentials": {
+        "imap": {
+          "id": "N2nKDP5iUD9FePjs",
+          "name": "Gmail IMAP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ac92d095-a963-44e3-9baf-48781bc32941",
+                    "leftValue": "={{ $('Mail Data').item.json.domain }}",
+                    "rightValue": "naver",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "naver"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Mail Data').item.json.domain }}",
+                    "rightValue": "gmail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8336d32e-a6a4-4491-950b-8676692b50db"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "gmail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        992,
+        -224
+      ],
+      "id": "873c9cff-f94d-4c28-bb50-8e97522352b9",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "authentication": "coreImapAccount",
+        "resource": "email",
+        "operation": "moveEmail",
+        "sourceMailbox": {
+          "__rl": true,
+          "mode": "list",
+          "value": "INBOX"
+        },
+        "emailUid": "={{ $('Mail Data').item.json.emailId }}",
+        "destinationMailbox": {
+          "__rl": true,
+          "value": "Junk",
+          "mode": "list",
+          "cachedResultName": "Junk"
+        }
+      },
+      "type": "n8n-nodes-imap.imap",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        -304
+      ],
+      "id": "f7cfc274-536d-428a-9327-d2828fa13d04",
+      "name": "moveNaverEmail",
+      "credentials": {
+        "imap": {
+          "id": "LwDBek3MSRQ6OsaS",
+          "name": "Naver IMAP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 이메일 스팸처리",
+        "height": 320,
+        "width": 512,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        944,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "949937bb-4606-4d24-986c-acd701b28a2d",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "postProcessAction": "nothing",
+        "format": "resolved",
+        "options": {
+          "trackLastMessageId": true
+        }
+      },
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2.1,
+      "position": [
+        -192,
+        112
+      ],
+      "id": "d429728a-0a57-4d1b-931b-79e6c1f69f8d",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "imap": {
+          "id": "N2nKDP5iUD9FePjs",
+          "name": "Gmail IMAP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6f53354b-b2cb-49e8-b728-152581ff0024",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "fa8c0d46-f66c-4bb7-be73-1420bbeba861",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "a2805a57-a5fc-4900-81c0-355279bedb62",
+              "name": "uid",
+              "value": "={{ $json.attributes.uid }}",
+              "type": "number"
+            },
+            {
+              "id": "5530f568-592c-44d8-a272-c2ef9ae114d8",
+              "name": "domain",
+              "value": "gmail",
+              "type": "string"
+            },
+            {
+              "id": "5a8a64d7-2bfb-441d-8c2c-cba0c018d8c0",
+              "name": "FromName",
+              "value": "={{ $json.from.value[0].name }}",
+              "type": "string"
+            },
+            {
+              "id": "55f86961-b622-454a-8137-5c99165cd0b2",
+              "name": "FromEmail",
+              "value": "={{ $json.from.value[0].address }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        112
+      ],
+      "id": "fe273ca4-e6b1-4a58-9b9c-2104816bf63a",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "NaverMail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Mail Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cal-Write": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mail Data": {
+      "main": [
+        [
+          {
+            "node": "Email Categorize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cal-Read": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "IfConfirmed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "current-date": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IfConfirmed": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Categorize",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Email Categorize",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Categorize": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "moveNaverEmail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MoveGmailEmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Mail Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5fe84185-b0f3-402b-8a1b-003766c36ace",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "Rke4TV6OtPzRk5DL",
+  "tags": []
+}
